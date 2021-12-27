@@ -46,9 +46,13 @@ var tasks = [NSDictionary]()
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: "TaskCell", for: indexPath)
         
-        cell.textLabel?.text = tasks[indexPath.row]["name"] as? String
+        cell.textLabel?.text = tasks[indexPath.row]["objective"] as? String
         
         return cell
     }
 
+    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
+        let c = segue.destination as! AddAndEditViewController
+        c.delegate = self
+    }
 }
