@@ -9,6 +9,7 @@ import UIKit
 
 class TableViewController: UITableViewController {
 var tasks = [NSDictionary]()
+    var i : IndexPath?
     override func viewDidLoad() {
         super.viewDidLoad()
 
@@ -37,7 +38,22 @@ var tasks = [NSDictionary]()
         // #warning Incomplete implementation, return the number of sections
         return 1
     }
-
+    
+    override func prepare(for segue: UIStoryboardSegue, sender: Any?){
+        let v = segue.destination as? AddAndEditViewController
+        v?.delegate = self
+        
+        if let taskEdited  = sender as? NSDictionary{
+            v!.i = self.i
+            v?.taskEdied = taskEdited
+        }
+    }
+    
+    
+    override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        self.i = indexPath
+        performSegue(withIdentifier: "AddSegue", sender: tasks[i!.row])
+    }
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         // #warning Incomplete implementation, return the number of rows
         return tasks.count
@@ -50,9 +66,19 @@ var tasks = [NSDictionary]()
         
         return cell
     }
-
-    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
-        let c = segue.destination as! AddAndEditViewController
-        c.delegate = self
+    
+    override func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCell.EditingStyle, forRowAt indexPath: IndexPath) {
+        let i = tasks[indexPath.row].value(forKey: "id")
+        TaskModel.delTask(i: i) { data, response, error in
+            JSONSerialization.jsonObject(with: data!, options: JSONSerialization.ReadingOptions.mutableContainers) as! NSDictionary
+            
+        }
+        tasks.remove(at: indexPath.row)
+        tableView.reloadData()
     }
+
+//    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
+//        let c = segue.destination as! AddAndEditViewController
+//        c.delegate = self
+//    }
 }

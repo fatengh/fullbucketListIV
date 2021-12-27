@@ -36,4 +36,36 @@ class TaskModel {
                 task.resume()
             }
     }
-}
+    
+    static func updateTask(task: NSDictionary, completionHandler: @escaping(_ data: Data?, _ response: URLResponse?, _ error: Error?) -> Void) {
+        
+        let url = URL(string: "https://saudibucketlistapi.herokuapp.com/tasks/")!
+        var req = URLRequest(url: url)
+        req.httpMethod = "PUT"
+        do{
+            let bodyData = try JSONSerialization.data(withJSONObject: task, options: .prettyPrinted)
+            req.httpBody = bodyData
+            req.addValue("application/json", forHTTPHeaderField: "Content-Typ")
+            let ses = URLSession.shared
+            let task = ses.dataTask(with: req, completionHandler: completionHandler)
+            task.resume()
+            
+        }catch {
+            
+        }
+        
+        }
+        
+    static func delTask(i: Int, completionHandler: @escaping(_ data: Data?, _ response: URLResponse?, _ error: Error?) -> Void) {
+        let url = URL(string: "https://saudibucketlistapi.herokuapp.com/tasks/")!
+        var req = URLRequest(url: url)
+         req.httpMethod = "DELETE"
+        
+        let bodyData = "id=\(i)"
+        req.httpBody = bodyData(using: String.Encoding.utf8)
+        let ses = URLSession.shared
+        let task = ses.dataTask(with: req, completionHandler: completionHandler)
+        task.resume()
+
+        
+    }}
