@@ -34,6 +34,7 @@
                     <navigationItem key="navigationItem" id="u0N-3z-dxw">
                         <barButtonItem key="rightBarButtonItem" systemItem="add" id="pOB-1e-VkX">
                             <connections>
+                                <action selector="tonextPage:" destination="QQl-z0-9yD" id="o9V-St-UGj"/>
                                 <segue destination="LD7-6R-SMF" kind="show" identifier="AddSegue" id="96M-HM-bUc"/>
                             </connections>
                         </barButtonItem>
@@ -46,7 +47,7 @@
         <!--Add And Edit View Controller-->
         <scene sceneID="Goh-SX-y9j">
             <objects>
-                <viewController id="LD7-6R-SMF" customClass="AddAndEditViewController" customModule="BucketListiOSClienSide" customModuleProvider="target" sceneMemberID="viewController">
+                <viewController storyboardIdentifier="AddAndEditViewController" id="LD7-6R-SMF" customClass="AddAndEditViewController" customModule="BucketListiOSClienSide" customModuleProvider="target" sceneMemberID="viewController">
                     <view key="view" contentMode="scaleToFill" id="hDc-qh-yK7">
                         <rect key="frame" x="0.0" y="0.0" width="414" height="896"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>

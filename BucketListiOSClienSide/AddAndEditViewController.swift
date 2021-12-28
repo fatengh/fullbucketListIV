@@ -7,74 +7,67 @@
 
 import UIKit
 
+
+
 class AddAndEditViewController: UIViewController {
 
     @IBOutlet weak var taskField: UITextField!
-    
-    var delegate: TableViewController?
-    
+    var selectedTask : TasksClass?
+    var delegate : addDelegate?
     var taskEdied: NSDictionary?
     var i: IndexPath?
     
     
     @IBAction func AddPressed(_ sender: UIButton) {
-        let newString = taskField.text!
         
+        guard let taskObj = taskField.text else { return  }
         
-        
-        if taskEdied != nil {
+        if selectedTask != nil {
             
-            
-            taskEdied?.setValue(newString, forKey: "objective")
-            
-            TaskModel.updateTask(task: taskEdied!, completionHandler: { data, response, error in
-            if data != nil {
-                
-                
-                do{
-                    let w = try JSONSerialization.jsonObject(with: data!, options: JSONSerialization.ReadingOptions.mutableContainers) as! NSDictionary
+            guard let id = selectedTask?.id else {return }
+            TaskModel.updatetask(objective: taskObj, id : id) { data, response, error in
+                if data != nil {
+                    self.delegate?.relodeTasks()
                     DispatchQueue.main.async {
-                        
-                        self.delegate?.tasks[self.i!.row] = w
-                        print(w)
-                        self.delegate?.tableView.reloadData()
-                        let _ =  self.navigationController?.viewControllers.popLast()
+
+                        self.navigationController?.popViewController(animated: true)
                     }
-                } catch {
-                   
                     
-                    }
-                
-            
+                }
             }
-                
-            })
-           
-            
-            
-            
-        } else {
-        TaskModel.addTasks(objective: newString, completionHandler:  { data, response, error in
-            
-            if data != nil {
-                do{
-                    let task = try JSONSerialization.jsonObject(with: data!, options: JSONSerialization.ReadingOptions.mutableContainers) as! NSDictionary
+        }
+        else {
+            TaskModel.addTaskWithObjective(objective: taskObj, completionHandler:{ data, response, error in
+                if data != nil
+                {do {
+                    let  _ = try  JSONDecoder().decode(TasksClass.self, from: data!)
+                    if error != nil {
+                        print(error?.localizedDescription)
+                    }
+                    self.delegate?.relodeTasks()
                     DispatchQueue.main.async {
-                        self.delegate?.tasks.append(task)
-                        self.delegate?.tableView.reloadData()
-                        let _ =  self.navigationController?.viewControllers.popLast()
+                        self.navigationController?.popViewController(animated: true)
                     }
                 }catch{
-                    print(error)
+                    print(error.localizedDescription)
+                }}
+                else {
+                    print ("no response")
                 }
-            }else{
-                print("no response")
-            }
-         })
+            })
         }
+      
     }
+    
     override func viewDidLoad() {
         super.viewDidLoad()
-        taskField.text = taskEdied?.value(forKey: "objective") as? String
-    }
+        if selectedTask == nil {
+        
+            taskField.text = ""
+        }else{
+        taskField.text = selectedTask!.objective
+            }
 }
+
+}
+

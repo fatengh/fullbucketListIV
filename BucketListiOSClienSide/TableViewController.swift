@@ -7,78 +7,80 @@
 
 import UIKit
 
-class TableViewController: UITableViewController {
-var tasks = [NSDictionary]()
+class TableViewController: UITableViewController, addDelegate {
+
+    
+ 
+    func relodeTasks() {
+        fecthData()
+    }
+ 
+    var  tasks = [TasksClass]()
     var i : IndexPath?
+    var names = [String]()
+    
+    
     override func viewDidLoad() {
         super.viewDidLoad()
-
-        TaskModel.getAllTasks() {
-                 data, response, error in
-                 do {
-                     if data != nil {
-                     let tasksDic = try JSONSerialization.jsonObject(with: data!, options: JSONSerialization.ReadingOptions.mutableContainers) as? NSArray
-                            for task in tasksDic!{
-                         self.tasks.append(task as! NSDictionary)
-                     }
-                         DispatchQueue.main.async {
-                             self.tableView.reloadData()
-                         }
-                     }
-                 } catch {
-                     print("Something went wrong")
-                 }
-             }
-             super.viewDidLoad()
-    }
-
-    // MARK: - Table view data source
-
-    override func numberOfSections(in tableView: UITableView) -> Int {
-        // #warning Incomplete implementation, return the number of sections
-        return 1
+        fecthData()
     }
     
-    override func prepare(for segue: UIStoryboardSegue, sender: Any?){
-        let v = segue.destination as? AddAndEditViewController
-        v?.delegate = self
-        
-        if let taskEdited  = sender as? NSDictionary{
-            v!.i = self.i
-            v?.taskEdied = taskEdited
+    
+    func fecthData()
+    {
+        TaskModel.getAllTasks() {
+            data, response, error in
+            do {
+                self.tasks = try  JSONDecoder().decode([TasksClass].self, from: data!)
+                DispatchQueue.main.async {
+                    self.tableView.reloadData()
+                }
+            } catch {
+                print("Something went wrong")
+            }
         }
     }
-    
-    
-    override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        self.i = indexPath
-        performSegue(withIdentifier: "AddSegue", sender: tasks[i!.row])
+
+    // ADD BUTTON
+    @IBAction func nextPage(_ sender: UIBarButtonItem) {
+        let vc = self.storyboard?.instantiateViewController(withIdentifier: "AddAndEditViewController") as! AddAndEditViewController
+        vc.delegate = self
+        vc.selectedTask = nil
+        self.navigationController?.pushViewController(vc, animated: true)
+        
     }
-    override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        // #warning Incomplete implementation, return the number of rows
+    
+   override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         return tasks.count
     }
-
+    
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: "TaskCell", for: indexPath)
-        
-        cell.textLabel?.text = tasks[indexPath.row]["objective"] as? String
-        
+        cell.textLabel?.text = String("\(tasks[indexPath.row].objective)")
         return cell
+        
     }
-    
+ // UPDATE
+    override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        self.i = indexPath
+        let vc = self.storyboard?.instantiateViewController(withIdentifier: "AddAndEditViewController") as! AddAndEditViewController
+        vc.delegate = self
+        vc.selectedTask = tasks[indexPath.row]
+        self.navigationController?.pushViewController(vc, animated: true)
+        
+    }
+    // DELETE
     override func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCell.EditingStyle, forRowAt indexPath: IndexPath) {
-        let i = tasks[indexPath.row].value(forKey: "id")
-        TaskModel.delTask(i: i) { data, response, error in
-            JSONSerialization.jsonObject(with: data!, options: JSONSerialization.ReadingOptions.mutableContainers) as! NSDictionary
-            
+        if  let id = tasks[indexPath.row].id
+        {
+            print("id= \(id)")
+            TaskModel.deleteTask(id: id) { data, response, error in
+                if error != nil {
+                    print(error)
+                }
+                if data != nil {
+                    self.fecthData()}
+            }
         }
-        tasks.remove(at: indexPath.row)
-        tableView.reloadData()
-    }
-
-//    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
-//        let c = segue.destination as! AddAndEditViewController
-//        c.delegate = self
-//    }
+}
 }
