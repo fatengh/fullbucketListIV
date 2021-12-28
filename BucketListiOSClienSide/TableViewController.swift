@@ -28,7 +28,7 @@ class TableViewController: UITableViewController, addDelegate {
     
     func fecthData()
     {
-        TaskModel.getAllTasks() {
+        TaskModel.getTasks() {
             data, response, error in
             do {
                 self.tasks = try  JSONDecoder().decode([TasksClass].self, from: data!)
@@ -74,7 +74,7 @@ class TableViewController: UITableViewController, addDelegate {
         if  let id = tasks[indexPath.row].id
         {
             print("id= \(id)")
-            TaskModel.deleteTask(id: id) { data, response, error in
+            TaskModel.deleteTasks(id: id) { data, response, error in
                 if error != nil {
                     print(error)
                 }

@@ -25,7 +25,7 @@ class AddAndEditViewController: UIViewController {
         if selectedTask != nil {
             
             guard let id = selectedTask?.id else {return }
-            TaskModel.updatetask(objective: taskObj, id : id) { data, response, error in
+            TaskModel.updateTasks(objective: taskObj, id : id) { data, response, error in
                 if data != nil {
                     self.delegate?.relodeTasks()
                     DispatchQueue.main.async {
@@ -37,7 +37,7 @@ class AddAndEditViewController: UIViewController {
             }
         }
         else {
-            TaskModel.addTaskWithObjective(objective: taskObj, completionHandler:{ data, response, error in
+            TaskModel.addTasks(objective: taskObj, completionHandler:{ data, response, error in
                 if data != nil
                 {do {
                     let  _ = try  JSONDecoder().decode(TasksClass.self, from: data!)

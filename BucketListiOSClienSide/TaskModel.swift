@@ -14,7 +14,7 @@ protocol addDelegate {
 
 class TaskModel {
   
-        static func getAllTasks(completionHandler: @escaping(_ data: Data?, _ response: URLResponse?, _ error: Error?) -> Void) {
+        static func getTasks(completionHandler: @escaping(_ data: Data?, _ response: URLResponse?, _ error: Error?) -> Void) {
            let url = URL(string: "https://saudibucketlistapi.herokuapp.com/tasks/")
             let session = URLSession.shared
             let task = session.dataTask(with: url!, completionHandler: completionHandler)
@@ -23,19 +23,14 @@ class TaskModel {
         
         
         
-        static func addTaskWithObjective(objective: String, completionHandler: @escaping(_ data: Data?, _ response: URLResponse?, _ error: Error?) -> Void) {
-         // Create the url to request
-                if let urlToReq = URL(string: "https://saudibucketlistapi.herokuapp.com/tasks/") {
-                    // Create an NSMutableURLRequest using the url. This Mutable Request will allow us to modify the headers.
-                    var request = URLRequest(url: urlToReq)
-                    // Set the method to POST
-                    request.httpMethod = "POST"
-                    // Create some bodyData and attach it to the HTTPBody
+        static func addTasks(objective: String, completionHandler: @escaping(_ data: Data?, _ response: URLResponse?, _ error: Error?) -> Void) {
+                if let url = URL(string: "https://saudibucketlistapi.herokuapp.com/tasks/") {
+                    var req = URLRequest(url: url)
+                    req.httpMethod = "POST"
                     let bodyData = "objective=\(objective)"
-                    request.httpBody = bodyData.data(using: .utf8)
-                    // Create the session
+                    req.httpBody = bodyData.data(using: .utf8)
                     let session = URLSession.shared
-                    let task = session.dataTask(with: request as URLRequest, completionHandler: completionHandler)
+                    let task = session.dataTask(with: req as URLRequest, completionHandler: completionHandler)
                     task.resume()
                 }
         }
@@ -43,17 +38,17 @@ class TaskModel {
     
     
 
-        static func updatetask(objective: String,id: Int, completionHandler: @escaping(_ data: Data?, _ response: URLResponse?, _ error: Error?) -> Void){
-        //    let url = URL(string:"https://saudibucketlistapi.herokuapp.com/tasks/\(id)/")!
-            var request = URLRequest(url: URL(string:"https://saudibucketlistapi.herokuapp.com/tasks/\(id)/")!)
-            request.httpMethod = "PUT"
+        static func updateTasks(objective: String,id: Int, completionHandler: @escaping(_ data: Data?, _ response: URLResponse?, _ error: Error?) -> Void){
+            let url = URL(string:"https://saudibucketlistapi.herokuapp.com/tasks/\(id)/")!
+            var req = URLRequest(url: url)
+            req.httpMethod = "PUT"
             do{
-                let requestObj = TaskRequest.init(objective: objective)
-                let BodyData = try JSONEncoder().encode(requestObj)
-                request.httpBody = BodyData
-                request.addValue("application/json", forHTTPHeaderField: "Content-Type")
-                print(request.httpBody)
-                let task = URLSession.shared.dataTask(with: request) { data, response, error in
+                let objReq = TaskRequest.init(objective: objective)
+                let BodyData = try JSONEncoder().encode(objReq)
+                req.httpBody = BodyData
+                req.addValue("application/json", forHTTPHeaderField: "Content-Type")
+                print(req.httpBody)
+                let task = URLSession.shared.dataTask(with: req) { data, response, error in
                     if error != nil {
                         completionHandler(nil, nil, error)
                     } else {
@@ -67,14 +62,13 @@ class TaskModel {
             }
             
         }
-        static func deleteTask(id : Int, completionHandler: @escaping(_ data: Data?, _ response: URLResponse?, _ error: Error?) -> Void){
-            //let url = URL(string:"https://saudibucketlistapi.herokuapp.com/tasks/\(id)")!
-            var request = URLRequest(url: URL(string:"https://saudibucketlistapi.herokuapp.com/tasks/\(id)")!)
-            request.httpMethod = "DELETE"
-
+        static func deleteTasks(id : Int, completionHandler: @escaping(_ data: Data?, _ response: URLResponse?, _ error: Error?) -> Void){
+            let url = URL(string:"https://saudibucketlistapi.herokuapp.com/tasks/\(id)/")!
+            var req = URLRequest(url: url)
+            req.httpMethod = "DELETE"
            let BodyData = "id=\(id)"
-            request.httpBody = BodyData.data(using: String.Encoding.utf8)
-            let task = URLSession.shared.dataTask(with: request) { data, response, error in
+            req.httpBody = BodyData.data(using: String.Encoding.utf8)
+            let task = URLSession.shared.dataTask(with: req) { data, response, error in
                 if error != nil {
                     completionHandler(nil, nil, error)
                 } else {
@@ -88,6 +82,3 @@ class TaskModel {
 
     }
 
-    struct TaskRequest: Codable {
-        let objective:String
-    }

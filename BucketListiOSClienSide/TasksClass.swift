@@ -13,3 +13,9 @@ struct TasksClass : Codable{
     var objective: String
     var created_at : String
 }
+
+
+
+struct TaskRequest: Codable {
+    let objective:String
+}
